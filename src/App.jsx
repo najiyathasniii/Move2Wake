@@ -412,6 +412,7 @@ function App() {
         {!alarmRinging ? (
 
           <>
+
             {/* =====================
                 HERO
             ===================== */}
@@ -431,6 +432,7 @@ function App() {
                   <span>
                     Move.
                   </span>
+
                 </h1>
 
                 <p className="description">
@@ -536,23 +538,74 @@ function App() {
 
                   <button
                     className="set-alarm-button"
-                    onClick={() => {
+                    onClick={async () => {
 
                       if (!alarmTime) {
-
                         alert(
                           "Please select a time."
                         );
-
                         return;
                       }
 
-                      setAlarmSet(true);
+                      try {
+
+                        const response =
+                          await fetch(
+                            "https://move2wake.onrender.com/api/alarms",
+                            {
+                              method: "POST",
+
+                              headers: {
+                                "Content-Type":
+                                  "application/json",
+                              },
+
+                              body: JSON.stringify({
+                                alarmTime:
+                                  alarmTime,
+
+                                challenge:
+                                  challenge,
+                              }),
+                            }
+                          );
+
+                        const data =
+                          await response.json();
+
+                        if (response.ok) {
+
+                          console.log(
+                            "Alarm saved:",
+                            data
+                          );
+
+                          setAlarmSet(true);
+
+                        } else {
+
+                          alert(
+                            "Failed to save alarm."
+                          );
+
+                        }
+
+                      } catch (error) {
+
+                        console.error(
+                          "Backend error:",
+                          error
+                        );
+
+                        alert(
+                          "Could not connect to server."
+                        );
+
+                      }
+
                     }}
                   >
-
                     ⏰ Set Alarm
-
                   </button>
 
                 ) : (
@@ -561,9 +614,7 @@ function App() {
                     className="cancel-button"
                     onClick={cancelAlarm}
                   >
-
                     Cancel Alarm
-
                   </button>
 
                 )}
@@ -643,6 +694,7 @@ function App() {
               )}
 
             </section>
+
           </>
 
         ) : (
