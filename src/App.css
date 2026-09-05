@@ -1,0 +1,358 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f7f7f4;
+  color: #171717;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+/* HEADER */
+
+.header {
+  height: 76px;
+  padding: 0 7%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #e5e5df;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.logo-icon {
+  width: 35px;
+  height: 35px;
+  border-radius: 10px;
+  background: #171717;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  font-size: 14px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: green;
+}
+
+/* MAIN */
+
+.main-content {
+  width: min(1100px, 90%);
+  margin: auto;
+}
+
+/* HERO */
+
+.hero {
+  min-height: 500px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 50px;
+}
+
+.small-label {
+  margin-bottom: 15px;
+  color: #777;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: 65px;
+  line-height: 1;
+  letter-spacing: -3px;
+}
+
+.hero h1 span {
+  color: #777;
+}
+
+.description {
+  max-width: 480px;
+  margin-top: 25px;
+  color: #666;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+/* HERO VISUAL */
+
+.hero-visual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.motion-circle {
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: #e6e6e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.person {
+  font-size: 130px;
+}
+
+/* ALARM */
+
+.alarm-section {
+  padding: 70px 0;
+}
+
+.section-heading h2 {
+  margin: 0;
+  font-size: 36px;
+}
+
+.alarm-card {
+  margin-top: 30px;
+  padding: 30px;
+  background: white;
+  border: 1px solid #e2e2dc;
+  border-radius: 20px;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 20px;
+  align-items: end;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-group label {
+  font-size: 13px;
+  font-weight: bold;
+  color: #555;
+}
+
+.input-group input,
+.input-group select {
+  height: 52px;
+  padding: 0 15px;
+  border: 1px solid #d7d7d0;
+  border-radius: 10px;
+  background: #fafaf8;
+}
+
+.set-alarm-button,
+.cancel-button {
+  height: 52px;
+  padding: 0 25px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.set-alarm-button {
+  background: #171717;
+  color: white;
+}
+
+.set-alarm-button:hover {
+  background: #333;
+}
+
+.cancel-button {
+  background: #e8e8e3;
+  color: #222;
+}
+
+/* SUCCESS */
+
+.alarm-success {
+  margin-top: 20px;
+  padding: 20px;
+
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  background: #eeeeea;
+  border-radius: 15px;
+}
+
+.success-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #171717;
+  color: white;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.alarm-success p {
+  margin: 5px 0 0;
+  color: #666;
+}
+
+/* ALARM SCREEN */
+
+.alarm-screen {
+  min-height: calc(100vh - 150px);
+  padding: 60px 0;
+  text-align: center;
+}
+
+.alarm-screen h1 {
+  margin: 10px 0;
+  font-size: 65px;
+  letter-spacing: -3px;
+}
+
+.alarm-message {
+  color: #666;
+  font-size: 17px;
+}
+
+/* CAMERA */
+
+.camera-container {
+  position: relative;
+  width: min(700px, 100%);
+  margin: 35px auto 20px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: black;
+}
+
+.camera-container video {
+  width: 100%;
+  display: block;
+  transform: scaleX(-1);
+}
+
+.camera-overlay {
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  color: white;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.movement-counter {
+  font-size: 75px;
+  font-weight: bold;
+}
+
+.movement-counter span {
+  font-size: 25px;
+  opacity: 0.8;
+}
+
+.camera-overlay p {
+  font-size: 18px;
+}
+
+/* PROGRESS */
+
+.progress-container {
+  width: min(700px, 100%);
+  height: 12px;
+  margin: auto;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #ddd;
+}
+
+.progress-bar {
+  height: 100%;
+  background: #171717;
+  transition: width 1s linear;
+}
+
+.progress-text {
+  color: #777;
+  font-size: 14px;
+}
+
+/* FOOTER */
+
+footer {
+  padding: 30px 7%;
+  border-top: 1px solid #e5e5df;
+
+  display: flex;
+  justify-content: space-between;
+
+  color: #777;
+  font-size: 13px;
+}
+
+footer p {
+  margin: 0;
+  color: #222;
+  font-weight: bold;
+}
+
+/* MOBILE */
+
+@media (max-width: 800px) {
+
+  .hero {
+    grid-template-columns: 1fr;
+    padding: 50px 0;
+  }
+
+  .hero h1 {
+    font-size: 50px;
+  }
+
+  .alarm-card {
+    grid-template-columns: 1fr;
+  }
+
+  .alarm-screen h1 {
+    font-size: 45px;
+  }
+
+  footer {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
