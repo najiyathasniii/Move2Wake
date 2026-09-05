@@ -547,64 +547,46 @@ function App() {
                         return;
                       }
 
-                      try {
+                     try {
+  const response = await fetch(
+    "https://move2wake.onrender.com/api/alarms",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        alarmTime: alarmTime,
+        challenge: challenge,
+      }),
+    }
+  );
 
-                        const response =
-                          await fetch(
-                            "https://move2wake.onrender.com/api/alarms",
-                            {
-                              method: "POST",
+  const text = await response.text();
 
-                              headers: {
-                                "Content-Type":
-                                  "application/json",
-                              },
+  console.log("Backend status:", response.status);
+  console.log("Backend response:", text);
 
-                              body: JSON.stringify({
-                                alarmTime:
-                                  alarmTime,
+  if (response.ok) {
+    console.log("Alarm saved successfully!");
+    setAlarmSet(true);
+  } else {
+    alert(
+      "Backend error: " +
+        response.status +
+        "\n" +
+        text
+    );
+  }
 
-                                challenge:
-                                  challenge,
-                              }),
-                            }
-                          );
+} catch (error) {
+  console.error("Backend error:", error);
 
-                        const data =
-                          await response.json();
-
-                        if (response.ok) {
-
-                          console.log(
-                            "Alarm saved:",
-                            data
-                          );
-
-                          setAlarmSet(true);
-
-                        } else {
-
-                          alert(
-                            "Failed to save alarm."
-                          );
-
-                        }
-
-                      } catch (error) {
-
-                        console.error(
-                          "Backend error:",
-                          error
-                        );
-
-                        alert(
-                          "Could not connect to server."
-                        );
-
-                      }
-
-                    }}
-                  >
+  alert(
+    "Connection error:\n" +
+      error.message
+  );
+}
                     ⏰ Set Alarm
                   </button>
 
