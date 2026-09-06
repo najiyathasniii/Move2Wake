@@ -4,7 +4,7 @@
         <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
         <item name="android:enforceStatusBarContrast">false</item>
         <item name="android:enforceNavigationBarContrast">false</item>
-        <item name="isLightTheme">?android:attr/isLightTheme</item>
     </style>
-    <style name="Base.Theme.SplashScreen.Light" parent="Base.Theme.SplashScreen"/>
+    <style name="Base.Theme.SplashScreen.Light" parent="Base.Theme.SplashScreen">
+    </style>
 </resources>

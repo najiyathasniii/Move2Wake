@@ -1,4 +1,4 @@
-com.example.app
+com.move2wake.app
 anim abc_fade_in
 anim abc_fade_out
 anim abc_grow_fade_in_from_bottom
@@ -654,7 +654,6 @@ drawable ic_call_decline
 drawable ic_call_decline_low
 drawable ic_launcher_background
 drawable ic_launcher_foreground
-drawable ic_transparent
 drawable icon_background
 drawable notification_action_background
 drawable notification_bg
@@ -1390,4 +1389,3 @@ styleable ViewBackgroundHelper android_background backgroundTint backgroundTintM
 styleable ViewStubCompat android_id android_layout android_inflatedId
 xml config
 xml file_paths
-xml localnotifications_provider_paths

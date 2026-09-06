@@ -4,7 +4,7 @@
     "type": "LINKED_RESOURCES_BINARY_FORMAT",
     "kind": "Directory"
   },
-  "applicationId": "com.example.app",
+  "applicationId": "com.move2wake.app",
   "variantName": "debug",
   "elements": [
     {
