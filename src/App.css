@@ -710,5 +710,50 @@ footer p {
 
   .person {
     font-size: 80px;
+
+    text-align: center;
+  }
+}
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 500px) {
+
+  .header {
+    height: 68px;
+  }
+
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+
+    font-size: 18px;
+  }
+
+  .logo {
+    font-size: 18px;
+  }
+
+  .hero h1 {
+    font-size: 42px;
+  }
+
+  .description {
+    font-size: 15px;
+  }
+
+  .alarm-card {
+    padding: 20px;
+  }
+
+  .motion-circle {
+    width: 210px;
+    height: 210px;
+  }
+
+  .person {
+    font-size: 80px;
   }
 }

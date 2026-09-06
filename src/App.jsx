@@ -1,13 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 import { FilesetResolver, PoseLandmarker } from "@mediapipe/tasks-vision";
+import { LocalNotifications } from "@capacitor/local-notifications";
 import poseModel from "./models/pose_landmarker_lite.task?url";
 import "./App.css";
 
-function App() {
-  // ==============================
-  // STATE
-  // ==============================
+// HELPER MATH FUNCTION
+const calculateAngle = (a, b, c) => {
+  const radians = Math.atan2(c.y - b.y, c.x - b.x) - Math.atan2(a.y - b.y, a.x - b.x);
+  let angle = Math.abs((radians * 180.0) / Math.PI);
+  if (angle > 180.0) {
+    angle = 360 - angle;
+  }
+  return angle;
+};
 
+function App() {
   const [alarmTime, setAlarmTime] = useState("");
   const [challenge, setChallenge] = useState("move");
   const [alarmSet, setAlarmSet] = useState(false);
@@ -15,13 +22,9 @@ function App() {
   const [challengeComplete, setChallengeComplete] = useState(false);
 
   const [movementSeconds, setMovementSeconds] = useState(0);
+  const [repCount, setRepCount] = useState(0);
   const [movementDetected, setMovementDetected] = useState(false);
-
   const [cameraError, setCameraError] = useState("");
-
-  // ==============================
-  // REFERENCES
-  // ==============================
 
   const audioRef = useRef(null);
   const videoRef = useRef(null);
@@ -34,21 +37,45 @@ function App() {
   const lastFrameTimeRef = useRef(null);
   const movingTimeRef = useRef(0);
 
-  // ==============================
-  // CHECK ALARM TIME
-  // ==============================
+  const challengeRef = useRef(challenge);
+  const exerciseStateRef = useRef("start");
+  const repCountRef = useRef(0);
 
   useEffect(() => {
-    if (!alarmSet || !alarmTime || alarmRinging) {
-      return;
-    }
+    challengeRef.current = challenge;
+  }, [challenge]);
+
+  // CAPACITOR LOCAL NOTIFICATION PERMISSION & ACTIONS
+  useEffect(() => {
+    const setupNotifications = async () => {
+      try {
+        const status = await LocalNotifications.checkPermissions();
+        if (status.display !== "granted") {
+          await LocalNotifications.requestPermissions();
+        }
+
+        // നോട്ടിഫിക്കേഷനിൽ ക്ലിക്ക് ചെയ്യുമ്പോൾ അലാറം സ്ക്രീൻ കാണിക്കാൻ
+        await LocalNotifications.addListener(
+          "localNotificationActionPerformed",
+          (notification) => {
+            startAlarm();
+          }
+        );
+      } catch (e) {
+        console.log("LocalNotifications error:", e);
+      }
+    };
+    setupNotifications();
+  }, []);
+
+  // CHECK ALARM TIME IN FOREGROUND MODE
+  useEffect(() => {
+    if (!alarmSet || !alarmTime || alarmRinging) return;
 
     const timer = setInterval(() => {
       const now = new Date();
-
       const hours = String(now.getHours()).padStart(2, "0");
       const minutes = String(now.getMinutes()).padStart(2, "0");
-
       const currentTime = `${hours}:${minutes}`;
 
       if (currentTime === alarmTime) {
@@ -59,43 +86,68 @@ function App() {
     return () => clearInterval(timer);
   }, [alarmSet, alarmTime, alarmRinging]);
 
-  // ==============================
-  // START ALARM
-  // ==============================
+  // SCHEDULE CAPACITOR NOTIFICATION
+  const scheduleCapacitorNotification = async (timeStr) => {
+    try {
+      const [hours, minutes] = timeStr.split(":").map(Number);
+      const triggerDate = new Date();
+      triggerDate.setHours(hours, minutes, 0, 0);
+
+      if (triggerDate.getTime() <= Date.now()) {
+        triggerDate.setDate(triggerDate.getDate() + 1);
+      }
+
+      await LocalNotifications.cancel({ notifications: [{ id: 1 }] });
+      await LocalNotifications.schedule({
+        notifications: [
+          {
+            title: "⚡ Move2Wake Alarm",
+            body: "എഴുന്നേൽക്കാനുള്ള സമയമായി! Challenge പൂർത്തിയാക്കൂ.",
+            id: 1,
+            schedule: { at: triggerDate, allowWhileIdle: true },
+            sound: "alarm_sound.wav",
+            ongoing: true
+          },
+        ],
+      });
+    } catch (e) {
+      console.log("Error scheduling notification:", e);
+    }
+  };
 
   const startAlarm = async () => {
     setAlarmRinging(true);
     setChallengeComplete(false);
     setMovementSeconds(0);
+    setRepCount(0);
     setMovementDetected(false);
     setCameraError("");
 
     movingTimeRef.current = 0;
+    repCountRef.current = 0;
+    exerciseStateRef.current = "start";
     previousPositionRef.current = null;
     lastFrameTimeRef.current = null;
 
-    // Play alarm
     try {
       if (audioRef.current) {
+        audioRef.current.currentTime = 0;
         await audioRef.current.play();
       }
     } catch (error) {
-      console.log("Browser blocked automatic audio:", error);
+      console.log("Audio autoplay prevented:", error);
     }
 
     startCamera();
   };
 
-  // ==============================
-  // START CAMERA
-  // ==============================
-
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
-          width: 640,
-          height: 480,
+          facingMode: "user",
+          width: { ideal: 640 },
+          height: { ideal: 480 },
         },
         audio: false,
       });
@@ -104,23 +156,14 @@ function App() {
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-
         await videoRef.current.play();
-
         initializePoseLandmarker();
       }
     } catch (error) {
       console.error("Camera error:", error);
-
-      setCameraError(
-        "Camera permission is required. Please allow camera access."
-      );
+      setCameraError("Camera permission is required. Please allow camera access.");
     }
   };
-
-  // ==============================
-  // INITIALIZE MEDIAPIPE
-  // ==============================
 
   const initializePoseLandmarker = async () => {
     try {
@@ -128,190 +171,160 @@ function App() {
         "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
       );
 
-      const poseLandmarker = await PoseLandmarker.createFromOptions(
-        vision,
-        {
-          baseOptions: {
-            modelAssetPath: poseModel,
-            delegate: "GPU",
-          },
-
-          runningMode: "VIDEO",
-
-          numPoses: 1,
-        }
-      );
+      const poseLandmarker = await PoseLandmarker.createFromOptions(vision, {
+        baseOptions: {
+          modelAssetPath: poseModel,
+          delegate: "GPU",
+        },
+        runningMode: "VIDEO",
+        numPoses: 1,
+      });
 
       poseLandmarkerRef.current = poseLandmarker;
-
-      console.log("MediaPipe Pose Landmarker ready!");
-
       detectMovement();
     } catch (error) {
       console.error("MediaPipe error:", error);
     }
   };
 
-  // ==============================
-  // MOVEMENT DETECTION
-  // ==============================
-
   const detectMovement = () => {
-    if (
-      !videoRef.current ||
-      !poseLandmarkerRef.current
-    ) {
-      return;
-    }
+    if (!videoRef.current || !poseLandmarkerRef.current) return;
 
     const video = videoRef.current;
+    const currentChallenge = challengeRef.current;
 
     if (video.readyState >= 2) {
       const timestamp = performance.now();
+      const result = poseLandmarkerRef.current.detectForVideo(video, timestamp);
 
-      const result =
-        poseLandmarkerRef.current.detectForVideo(
-          video,
-          timestamp
-        );
-
-      // Check if body is detected
-      if (
-        result.landmarks &&
-        result.landmarks.length > 0
-      ) {
+      if (result.landmarks && result.landmarks.length > 0) {
         const landmarks = result.landmarks[0];
 
-        // Left shoulder
-        const leftShoulder = landmarks[11];
+        // --- 1. GENERAL MOVEMENT ---
+        if (currentChallenge === "move") {
+          const leftShoulder = landmarks[11];
+          const rightShoulder = landmarks[12];
+          const leftHip = landmarks[23];
+          const rightHip = landmarks[24];
 
-        // Right shoulder
-        const rightShoulder = landmarks[12];
+          const centerX = (leftShoulder.x + rightShoulder.x + leftHip.x + rightHip.x) / 4;
+          const centerY = (leftShoulder.y + rightShoulder.y + leftHip.y + rightHip.y) / 4;
+          const currentPosition = { x: centerX, y: centerY };
 
-        // Left hip
-        const leftHip = landmarks[23];
+          if (previousPositionRef.current) {
+            const dx = currentPosition.x - previousPositionRef.current.x;
+            const dy = currentPosition.y - previousPositionRef.current.y;
+            const movementDistance = Math.sqrt(dx * dx + dy * dy);
 
-        // Right hip
-        const rightHip = landmarks[24];
+            if (movementDistance > 0.015) {
+              setMovementDetected(true);
+              const currentTime = performance.now();
+              if (lastFrameTimeRef.current) {
+                const elapsed = (currentTime - lastFrameTimeRef.current) / 1000;
+                movingTimeRef.current += elapsed;
 
-        // Calculate body center
-        const centerX =
-          (leftShoulder.x +
-            rightShoulder.x +
-            leftHip.x +
-            rightHip.x) /
-          4;
+                const seconds = Math.min(10, Math.floor(movingTimeRef.current));
+                setMovementSeconds(seconds);
 
-        const centerY =
-          (leftShoulder.y +
-            rightShoulder.y +
-            leftHip.y +
-            rightHip.y) /
-          4;
+                if (movingTimeRef.current >= 10) {
+                  stopAlarm();
+                  return;
+                }
+              }
+              lastFrameTimeRef.current = currentTime;
+            } else {
+              setMovementDetected(false);
+            }
+          }
+          previousPositionRef.current = currentPosition;
+        } 
+        // --- 2. SQUATS LOGIC ---
+        else if (currentChallenge === "squats") {
+          const leftHip = landmarks[23];
+          const leftKnee = landmarks[25];
+          const leftAnkle = landmarks[27];
 
-        const currentPosition = {
-          x: centerX,
-          y: centerY,
-        };
+          // കാൽമുട്ടിന്റെ ആംഗിൾ
+          const kneeAngle = calculateAngle(leftHip, leftKnee, leftAnkle);
 
-        // Compare current position
-        // with previous position
-        if (previousPositionRef.current) {
-          const dx =
-            currentPosition.x -
-            previousPositionRef.current.x;
-
-          const dy =
-            currentPosition.y -
-            previousPositionRef.current.y;
-
-          const movementDistance = Math.sqrt(
-            dx * dx + dy * dy
-          );
-
-          // Movement threshold
-          if (movementDistance > 0.012) {
+          if (kneeAngle < 120) {
             setMovementDetected(true);
+            if (exerciseStateRef.current !== "down") {
+              exerciseStateRef.current = "down";
+            }
+          } else if (kneeAngle > 160) {
+            if (exerciseStateRef.current === "down") {
+              exerciseStateRef.current = "up";
+              repCountRef.current += 1;
+              setRepCount(repCountRef.current);
 
-            const currentTime =
-              performance.now();
-
-            if (lastFrameTimeRef.current) {
-              const elapsed =
-                (currentTime -
-                  lastFrameTimeRef.current) /
-                1000;
-
-              movingTimeRef.current += elapsed;
-
-              const seconds = Math.min(
-                10,
-                Math.floor(
-                  movingTimeRef.current
-                )
-              );
-
-              setMovementSeconds(seconds);
-
-              // Stop after 10 seconds
-              if (
-                movingTimeRef.current >= 10
-              ) {
+              if (repCountRef.current >= 5) {
                 stopAlarm();
                 return;
               }
             }
+          }
+        } 
+        // --- 3. JUMPING JACKS LOGIC ---
+        else if (currentChallenge === "jumping-jacks") {
+          const leftWrist = landmarks[15];
+          const rightWrist = landmarks[16];
+          const leftShoulder = landmarks[11];
+          const rightShoulder = landmarks[12];
+          const leftAnkle = landmarks[27];
+          const rightAnkle = landmarks[28];
 
-            lastFrameTimeRef.current =
-              currentTime;
+          const handsUp = leftWrist.y < leftShoulder.y && rightWrist.y < rightShoulder.y;
+          const feetApart = Math.abs(leftAnkle.x - rightAnkle.x) > 0.25;
+
+          if (handsUp && feetApart) {
+            setMovementDetected(true);
+            if (exerciseStateRef.current !== "out") {
+              exerciseStateRef.current = "out";
+            }
+          } else if (!handsUp && !feetApart) {
+            if (exerciseStateRef.current === "out") {
+              exerciseStateRef.current = "in";
+              repCountRef.current += 1;
+              setRepCount(repCountRef.current);
+
+              if (repCountRef.current >= 5) {
+                stopAlarm();
+                return;
+              }
+            }
           }
         }
-
-        previousPositionRef.current =
-          currentPosition;
       }
     }
 
-    animationFrameRef.current =
-      requestAnimationFrame(
-        detectMovement
-      );
+    animationFrameRef.current = requestAnimationFrame(detectMovement);
   };
 
-  // ==============================
-  // STOP ALARM
-  // ==============================
-
   const stopAlarm = () => {
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+
     setAlarmRinging(false);
     setAlarmSet(false);
     setChallengeComplete(true);
-    setMovementSeconds(10);
 
-    // Stop alarm sound
+    if (challenge === "move") {
+      setMovementSeconds(10);
+    } else {
+      setRepCount(5);
+    }
+
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
 
-    // Stop camera
     if (streamRef.current) {
-      streamRef.current
-        .getTracks()
-        .forEach((track) => {
-          track.stop();
-        });
-
+      streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
-    }
-
-    // Stop MediaPipe detection
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(
-        animationFrameRef.current
-      );
-
-      animationFrameRef.current = null;
     }
 
     previousPositionRef.current = null;
@@ -319,350 +332,135 @@ function App() {
     movingTimeRef.current = 0;
   };
 
-  // ==============================
-  // CANCEL ALARM
-  // ==============================
-
-  const cancelAlarm = () => {
+  const cancelAlarm = async () => {
     setAlarmSet(false);
     setAlarmTime("");
+    try {
+      await LocalNotifications.cancel({ notifications: [{ id: 1 }] });
+    } catch (e) {
+      console.log("Error canceling notification:", e);
+    }
   };
-
-  // ==============================
-  // CLEANUP
-  // ==============================
 
   useEffect(() => {
     return () => {
       if (animationFrameRef.current) {
-        cancelAnimationFrame(
-          animationFrameRef.current
-        );
+        cancelAnimationFrame(animationFrameRef.current);
       }
-
       if (streamRef.current) {
-        streamRef.current
-          .getTracks()
-          .forEach((track) => {
-            track.stop();
-          });
+        streamRef.current.getTracks().forEach((track) => track.stop());
       }
-
       if (poseLandmarkerRef.current) {
         poseLandmarkerRef.current.close();
       }
     };
   }, []);
 
-  // ==============================
-  // USER INTERFACE
-  // ==============================
+  const isMoveChallenge = challenge === "move";
+  const currentValue = isMoveChallenge ? movementSeconds : repCount;
+  const targetValue = isMoveChallenge ? 10 : 5;
+  const progressPercentage = (currentValue / targetValue) * 100;
 
   return (
     <div className="app">
-
-      {/* ==========================
-          ALARM SOUND
-      ========================== */}
-
-      <audio
-        ref={audioRef}
-        loop
-      >
-        <source
-          src="/alarm.mp3"
-          type="audio/mpeg"
-        />
+      <audio ref={audioRef} loop>
+        <source src="/alarm.mp3" type="audio/mpeg" />
       </audio>
 
-      {/* ==========================
-          HEADER
-      ========================== */}
-
       <header className="header">
-
         <div className="logo">
-
-          <span className="logo-icon">
-            ⚡
-          </span>
-
+          <span className="logo-icon">⚡</span>
           Move2Wake
-
         </div>
-
         <div className="status">
-
           <span className="status-dot"></span>
-
-          {alarmRinging
-            ? "Alarm Ringing"
-            : "Ready"}
-
+          {alarmRinging ? "Alarm Ringing" : "Ready"}
         </div>
-
       </header>
 
-      {/* ==========================
-          MAIN
-      ========================== */}
-
       <main className="main-content">
-
         {!alarmRinging ? (
-
           <>
-
-            {/* =====================
-                HERO
-            ===================== */}
-
             <section className="hero">
-
               <div className="hero-text">
-
-                <p className="small-label">
-                  WAKE UP DIFFERENT
-                </p>
-
+                <p className="small-label">WAKE UP DIFFERENT</p>
                 <h1>
-                  Don't just wake up.
-                  <br />
-
-                  <span>
-                    Move.
-                  </span>
-
+                  Don't just wake up.<br />
+                  <span>Move.</span>
                 </h1>
-
                 <p className="description">
-                  Move2Wake is an alarm that
-                  makes you get out of bed and
-                  move before it stops.
+                  Move2Wake is an alarm that makes you get out of bed and move before it stops.
                 </p>
-
               </div>
-
               <div className="hero-visual">
-
                 <div className="motion-circle">
-
-                  <div className="person">
-                    🕺
-                  </div>
-
+                  <div className="person">🕺</div>
                 </div>
-
               </div>
-
             </section>
 
-            {/* =====================
-                ALARM SECTION
-            ===================== */}
-
             <section className="alarm-section">
-
               <div className="section-heading">
-
-                <p className="small-label">
-                  YOUR ALARM
-                </p>
-
-                <h2>
-                  Set your wake-up time
-                </h2>
-
+                <p className="small-label">YOUR ALARM</p>
+                <h2>Set your wake-up time</h2>
               </div>
-
               <div className="alarm-card">
-
-                {/* ALARM TIME */}
-
                 <div className="input-group">
-
-                  <label>
-                    Alarm time
-                  </label>
-
+                  <label>Alarm time</label>
                   <input
                     type="time"
                     value={alarmTime}
                     onChange={(event) => {
-                      setAlarmTime(
-                        event.target.value
-                      );
-
+                      setAlarmTime(event.target.value);
                       setAlarmSet(false);
                     }}
                   />
-
                 </div>
-
-                {/* CHALLENGE */}
-
                 <div className="input-group">
-
-                  <label>
-                    Challenge
-                  </label>
-
+                  <label>Challenge</label>
                   <select
                     value={challenge}
-                    onChange={(event) =>
-                      setChallenge(
-                        event.target.value
-                      )
-                    }
+                    onChange={(event) => setChallenge(event.target.value)}
                   >
-
-                    <option value="move">
-                      Move for 10 seconds
-                    </option>
-
-                    <option value="squats">
-                      5 Squats
-                    </option>
-
-                    <option value="jumping-jacks">
-                      5 Jumping Jacks
-                    </option>
-
+                    <option value="move">Move for 10 seconds</option>
+                    <option value="squats">5 Squats</option>
+                    <option value="jumping-jacks">5 Jumping Jacks</option>
                   </select>
-
                 </div>
 
-                {/* BUTTON */}
-
                 {!alarmSet ? (
-
                   <button
                     className="set-alarm-button"
                     onClick={async () => {
-
                       if (!alarmTime) {
-                        alert(
-                          "Please select a time."
-                        );
+                        alert("Please select a time.");
                         return;
                       }
-
                       try {
-
-                        const response =
-                          await fetch(
-                            "https://move2wake.onrender.com/api/alarms",
-                            {
-                              method: "POST",
-
-                              headers: {
-                                "Content-Type":
-                                  "application/json",
-                              },
-
-                              body: JSON.stringify({
-                                alarmTime:
-                                  alarmTime,
-
-                                challenge:
-                                  challenge,
-                              }),
-                            }
-                          );
-
-                        const text =
-                          await response.text();
-
-                        console.log(
-                          "Backend status:",
-                          response.status
-                        );
-
-                        console.log(
-                          "Backend response:",
-                          text
-                        );
-
-                        if (response.ok) {
-
-                          console.log(
-                            "Alarm saved successfully!"
-                          );
-
-                          setAlarmSet(true);
-
-                        } else {
-
-                          alert(
-                            "Backend error: " +
-                              response.status +
-                              "\n" +
-                              text
-                          );
-
-                        }
-
+                        await scheduleCapacitorNotification(alarmTime);
+                        setAlarmSet(true);
                       } catch (error) {
-
-                        console.error(
-                          "Backend error:",
-                          error
-                        );
-
-                        alert(
-                          "Connection error:\n" +
-                            error.message
-                        );
-
+                        alert("Error setting alarm:\n" + error.message);
                       }
-
                     }}
                   >
                     ⏰ Set Alarm
                   </button>
-
                 ) : (
-
-                  <button
-                    className="cancel-button"
-                    onClick={cancelAlarm}
-                  >
+                  <button className="cancel-button" onClick={cancelAlarm}>
                     Cancel Alarm
                   </button>
-
                 )}
-
               </div>
 
-              {/* =====================
-                  ALARM SET MESSAGE
-              ===================== */}
-
               {alarmSet && (
-
                 <div className="alarm-success">
-
-                  <div className="success-icon">
-                    ✓
-                  </div>
-
+                  <div className="success-icon">✓</div>
                   <div>
-
-                    <strong>
-                      Alarm is set!
-                    </strong>
-
+                    <strong>Alarm is set!</strong>
+                    <p>Your alarm will ring at <b>{alarmTime}</b></p>
                     <p>
-                      Your alarm will ring at{" "}
-                      <b>
-                        {alarmTime}
-                      </b>
-                    </p>
-
-                    <p>
-                      Challenge:{" "}
-
-                      <b>
+                      Challenge: <b>
                         {challenge === "move"
                           ? "Move for 10 seconds"
                           : challenge === "squats"
@@ -670,166 +468,67 @@ function App() {
                           : "5 Jumping Jacks"}
                       </b>
                     </p>
-
                   </div>
-
                 </div>
-
               )}
-
-              {/* =====================
-                  COMPLETED MESSAGE
-              ===================== */}
 
               {challengeComplete && (
-
                 <div className="alarm-success">
-
-                  <div className="success-icon">
-                    ✓
-                  </div>
-
+                  <div className="success-icon">✓</div>
                   <div>
-
-                    <strong>
-                      Challenge completed!
-                    </strong>
-
-                    <p>
-                      Good morning! Your alarm
-                      has stopped.
-                    </p>
-
+                    <strong>Challenge completed!</strong>
+                    <p>Good morning! Your alarm has stopped.</p>
                   </div>
-
                 </div>
-
               )}
-
             </section>
-
           </>
-
         ) : (
-
-          /* ==========================
-             ALARM SCREEN
-          ========================== */
-
           <section className="alarm-screen">
-
-            <p className="small-label">
-              GOOD MORNING
-            </p>
-
-            <h1>
-              GET MOVING!
-            </h1>
-
+            <p className="small-label">GOOD MORNING</p>
+            <h1>GET MOVING!</h1>
             <p className="alarm-message">
-
               {challenge === "move"
                 ? "Move your body for 10 seconds to stop the alarm."
                 : challenge === "squats"
                 ? "Complete 5 squats to stop the alarm."
                 : "Complete 5 jumping jacks to stop the alarm."}
-
             </p>
-
-            {/* CAMERA */}
 
             <div className="camera-container">
-
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-              />
-
+              <video ref={videoRef} autoPlay playsInline muted />
               <div className="camera-overlay">
-
                 <div className="movement-counter">
-
-                  {movementSeconds}
-
-                  <span>
-                    /10
-                  </span>
-
+                  {currentValue}
+                  <span>/{targetValue}</span>
                 </div>
-
-                <p>
-
-                  {movementDetected
-                    ? "Movement detected! Keep moving!"
-                    : "Move your body!"}
-
-                </p>
-
+                <p>{movementDetected ? "Exercise action detected!" : "Do the selected exercise!"}</p>
               </div>
-
             </div>
-
-            {/* CAMERA ERROR */}
 
             {cameraError && (
-
-              <p
-                style={{
-                  color: "red",
-                  marginTop: "15px",
-                }}
-              >
-                {cameraError}
-              </p>
-
+              <p style={{ color: "red", marginTop: "15px" }}>{cameraError}</p>
             )}
 
-            {/* PROGRESS */}
-
             <div className="progress-container">
-
               <div
                 className="progress-bar"
-                style={{
-                  width:
-                    `${movementSeconds * 10}%`,
-                }}
+                style={{ width: `${progressPercentage}%` }}
               ></div>
-
             </div>
-
             <p className="progress-text">
-
-              {movementSeconds}
-              {" "}
-              seconds of movement completed
-
+              {isMoveChallenge
+                ? `${currentValue} seconds of movement completed`
+                : `${currentValue} reps completed`}
             </p>
-
           </section>
-
         )}
-
       </main>
 
-      {/* ==========================
-          FOOTER
-      ========================== */}
-
       <footer>
-
-        <p>
-          Move2Wake
-        </p>
-
-        <span>
-          Wake up. Move. Repeat.
-        </span>
-
+        <p>Move2Wake</p>
+        <span>Wake up. Move. Repeat.</span>
       </footer>
-
     </div>
   );
 }
