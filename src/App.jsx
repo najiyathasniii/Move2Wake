@@ -1,8 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { FilesetResolver, PoseLandmarker } from "@mediapipe/tasks-vision";
 import { LocalNotifications } from "@capacitor/local-notifications";
+import { registerPlugin } from "@capacitor/core"; // പുതിയ മാറ്റം
 import poseModel from "./models/pose_landmarker_lite.task?url";
 import "./App.css";
+
+// നമ്മുടെ കസ്റ്റം പ്ലഗിൻ രജിസ്റ്റർ ചെയ്യുന്നു
+const CustomAlarm = registerPlugin("AlarmPlugin");
 
 const calculateAngle = (a, b, c) => {
   const radians = Math.atan2(c.y - b.y, c.x - b.x) - Math.atan2(a.y - b.y, a.x - b.x);
@@ -83,6 +87,7 @@ function App() {
     setupNotifications();
   }, []);
 
+  // പുതിയ Native Plugin വഴി അലാറം സെറ്റ് ചെയ്യുന്നു
   const scheduleCapacitorNotification = async (timeStr) => {
     try {
       const [hours, minutes] = timeStr.split(":").map(Number);
@@ -93,24 +98,10 @@ function App() {
         triggerDate.setDate(triggerDate.getDate() + 1);
       }
 
-      await LocalNotifications.cancel({ notifications: [{ id: 1 }] });
-      await LocalNotifications.schedule({
-        notifications: [
-          {
-            title: "⚡ Move2Wake Alarm",
-            body: "Wake up! Complete the exercise challenge to stop the alarm!",
-            id: 1,
-            schedule: { at: triggerDate, allowWhileIdle: true },
-            sound: "alarm",
-            channelId: "alarm_channel_high",
-            ongoing: true,
-            autoCancel: false,
-            actionTypeId: "OPEN_ALARM",
-          },
-        ],
-      });
+      await CustomAlarm.setAlarm({ time: triggerDate.getTime() });
     } catch (e) {
       console.log("Error scheduling notification:", e);
+      throw e;
     }
   };
 
@@ -330,11 +321,12 @@ function App() {
     movingTimeRef.current = 0;
   };
 
+  // പുതിയ Native Plugin വഴി അലാറം കാൻസൽ ചെയ്യുന്നു
   const cancelAlarm = async () => {
     setAlarmSet(false);
     setAlarmTime("");
     try {
-      await LocalNotifications.cancel({ notifications: [{ id: 1 }] });
+      await CustomAlarm.cancelAlarm();
     } catch (e) {
       console.log("Error canceling notification:", e);
     }

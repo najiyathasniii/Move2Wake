@@ -15,6 +15,9 @@ import com.getcapacitor.BridgeActivity;
 public class MainActivity extends BridgeActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // പ്ലഗിൻ രജിസ്റ്റർ ചെയ്യുന്നു
+        registerPlugin(AlarmPlugin.class);
+        
         super.onCreate(savedInstanceState);
 
         createNotificationChannel();
@@ -44,7 +47,6 @@ public class MainActivity extends BridgeActivity {
             channel.setDescription(description);
             channel.enableVibration(true);
 
-            // Raw folder-ലെ alarm.mp3 ഫയൽ റഫർ ചെയ്യുന്നു
             Uri soundUri = Uri.parse("android.resource://" + getPackageName() + "/raw/alarm");
             AudioAttributes audioAttributes = new AudioAttributes.Builder()
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
