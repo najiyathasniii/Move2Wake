@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.move2wake.app"
+    package="com.getcapacitor.myapp"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -21,10 +21,10 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <permission
-        android:name="com.move2wake.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+        android:name="com.getcapacitor.myapp.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
         android:protectionLevel="signature" />
 
-    <uses-permission android:name="com.move2wake.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+    <uses-permission android:name="com.getcapacitor.myapp.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
 
     <application
         android:allowBackup="true"
@@ -37,7 +37,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.move2wake.app.MainActivity"
+            android:name="com.getcapacitor.myapp.MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode"
             android:exported="true"
             android:label="@string/title_activity_main"
@@ -54,7 +54,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.move2wake.app.fileprovider"
+            android:authorities="com.getcapacitor.myapp.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true" >
             <meta-data
@@ -63,7 +63,7 @@
         </provider>
         <provider
             android:name="androidx.startup.InitializationProvider"
-            android:authorities="com.move2wake.app.androidx-startup"
+            android:authorities="com.getcapacitor.myapp.androidx-startup"
             android:exported="false" >
             <meta-data
                 android:name="androidx.emoji2.text.EmojiCompatInitializer"

@@ -4,7 +4,7 @@
     "type": "MERGED_MANIFESTS",
     "kind": "Directory"
   },
-  "applicationId": "com.move2wake.app",
+  "applicationId": "com.getcapacitor.myapp",
   "variantName": "debug",
   "elements": [
     {

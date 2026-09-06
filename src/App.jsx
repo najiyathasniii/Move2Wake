@@ -44,7 +44,6 @@ function App() {
     challengeRef.current = challenge;
   }, [challenge]);
 
-  // SAFE NOTIFICATION SETUP (Crash ആകാതിരിക്കാൻ safe error handling ഉൾപ്പെടുത്തിയിട്ടുണ്ട്)
   useEffect(() => {
     const setupNotifications = async () => {
       try {
@@ -53,11 +52,12 @@ function App() {
           await LocalNotifications.requestPermissions();
         }
 
+        // sound "alarm" എന്ന് നൽകി (res/raw/alarm.mp3 റഫർ ചെയ്യാൻ)
         await LocalNotifications.createChannel({
           id: "alarm_channel_high",
           name: "Full Alarm Service",
           description: "High Priority Full Screen Alarm",
-          sound: "alarm_sound.mp3",
+          sound: "alarm", 
           importance: 5, 
           visibility: 1, 
           vibration: true,
@@ -101,7 +101,7 @@ function App() {
             body: "Wake up! Complete the exercise challenge to stop the alarm!",
             id: 1,
             schedule: { at: triggerDate, allowWhileIdle: true },
-            sound: "alarm_sound.mp3",
+            sound: "alarm",
             channelId: "alarm_channel_high",
             ongoing: true,
             autoCancel: false,

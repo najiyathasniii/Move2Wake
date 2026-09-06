@@ -4,7 +4,7 @@
     "type": "COMPATIBLE_SCREEN_MANIFEST",
     "kind": "Directory"
   },
-  "applicationId": "com.move2wake.app",
+  "applicationId": "com.getcapacitor.myapp",
   "variantName": "debug",
   "elements": []
 }
