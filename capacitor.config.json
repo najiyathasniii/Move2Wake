@@ -1,5 +1,12 @@
 {
-  "appId": "com.example.app",
-  "appName": "move2wake",
-  "webDir": "dist"
+  "appId": "com.move2wake.app",
+  "appName": "Move2Wake",
+  "webDir": "dist",
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_icon_config_sample",
+      "iconColor": "#488AFF",
+      "sound": "alarm_sound.mp3"
+    }
+  }
 }

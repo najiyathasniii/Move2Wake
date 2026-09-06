@@ -4,7 +4,6 @@ import { LocalNotifications } from "@capacitor/local-notifications";
 import poseModel from "./models/pose_landmarker_lite.task?url";
 import "./App.css";
 
-// HELPER MATH FUNCTION (Angle calculation between 3 joints)
 const calculateAngle = (a, b, c) => {
   const radians = Math.atan2(c.y - b.y, c.x - b.x) - Math.atan2(a.y - b.y, a.x - b.x);
   let angle = Math.abs((radians * 180.0) / Math.PI);
@@ -45,7 +44,7 @@ function App() {
     challengeRef.current = challenge;
   }, [challenge]);
 
-  // HIGH PRIORITY ALARM & NOTIFICATION CHANNEL SETUP
+  // SAFE NOTIFICATION SETUP (Crash ആകാതിരിക്കാൻ safe error handling ഉൾപ്പെടുത്തിയിട്ടുണ്ട്)
   useEffect(() => {
     const setupNotifications = async () => {
       try {
@@ -54,18 +53,16 @@ function App() {
           await LocalNotifications.requestPermissions();
         }
 
-        // FULL SCREEN HIGH PRIORITY ALARM CHANNEL
         await LocalNotifications.createChannel({
           id: "alarm_channel_high",
           name: "Full Alarm Service",
           description: "High Priority Full Screen Alarm",
-          sound: "alarm_sound.wav",
-          importance: 5, // MAX IMPORTANCE FOR POP-UP
-          visibility: 1, // VISIBLE ON LOCKSCREEN
+          sound: "alarm_sound.mp3",
+          importance: 5, 
+          visibility: 1, 
           vibration: true,
         });
 
-        // ACTION LISTENER WHEN USER TOUCHES NOTIFICATION
         await LocalNotifications.addListener(
           "localNotificationActionPerformed",
           () => {
@@ -73,7 +70,6 @@ function App() {
           }
         );
 
-        // ACTION LISTENER WHEN NOTIFICATION IS RECEIVED IN FOREGROUND/BACKGROUND
         await LocalNotifications.addListener(
           "localNotificationReceived",
           () => {
@@ -81,31 +77,12 @@ function App() {
           }
         );
       } catch (e) {
-        console.log("LocalNotifications error:", e);
+        console.log("LocalNotifications setup error:", e);
       }
     };
     setupNotifications();
   }, []);
 
-  // FOREGROUND INTERVAL TO TRIGGER ALARM ON EXACT SECOND
-  useEffect(() => {
-    if (!alarmSet || !alarmTime || alarmRinging) return;
-
-    const timer = setInterval(() => {
-      const now = new Date();
-      const hours = String(now.getHours()).padStart(2, "0");
-      const minutes = String(now.getMinutes()).padStart(2, "0");
-      const currentTime = `${hours}:${minutes}`;
-
-      if (currentTime === alarmTime) {
-        startAlarm();
-      }
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [alarmSet, alarmTime, alarmRinging]);
-
-  // SCHEDULE EXACT ALARM NOTIFICATION
   const scheduleCapacitorNotification = async (timeStr) => {
     try {
       const [hours, minutes] = timeStr.split(":").map(Number);
@@ -121,10 +98,10 @@ function App() {
         notifications: [
           {
             title: "⚡ Move2Wake Alarm",
-            body: "Wake up! Complete the exercise challenge now!",
+            body: "Wake up! Complete the exercise challenge to stop the alarm!",
             id: 1,
             schedule: { at: triggerDate, allowWhileIdle: true },
-            sound: "alarm_sound.wav",
+            sound: "alarm_sound.mp3",
             channelId: "alarm_channel_high",
             ongoing: true,
             autoCancel: false,
@@ -157,7 +134,7 @@ function App() {
         await audioRef.current.play();
       }
     } catch (error) {
-      console.log("Audio autoplay prevented:", error);
+      console.log("Audio play error:", error);
     }
 
     startCamera();
@@ -206,10 +183,10 @@ function App() {
       detectMovement();
     } catch (error) {
       console.error("MediaPipe error:", error);
+      setCameraError("Failed to initialize motion tracking. Please check your network.");
     }
   };
 
-  // POSE DETECTION LOGIC
   const detectMovement = () => {
     if (!videoRef.current || !poseLandmarkerRef.current) return;
 
@@ -223,7 +200,6 @@ function App() {
       if (result.landmarks && result.landmarks.length > 0) {
         const landmarks = result.landmarks[0];
 
-        // --- 1. GENERAL MOVEMENT CHALLENGE ---
         if (currentChallenge === "move") {
           const leftShoulder = landmarks[11];
           const rightShoulder = landmarks[12];
@@ -260,25 +236,18 @@ function App() {
             }
           }
           previousPositionRef.current = currentPosition;
-        } 
-        
-        // --- 2. ACCURATE SQUATS CHALLENGE ---
-        else if (currentChallenge === "squats") {
+        } else if (currentChallenge === "squats") {
           const leftHip = landmarks[23];
           const leftKnee = landmarks[25];
           const leftAnkle = landmarks[27];
-
           const rightHip = landmarks[24];
           const rightKnee = landmarks[26];
           const rightAnkle = landmarks[28];
 
-          // Calculate Knee Angles
           const leftKneeAngle = calculateAngle(leftHip, leftKnee, leftAnkle);
           const rightKneeAngle = calculateAngle(rightHip, rightKnee, rightAnkle);
 
-          // Either leg going down triggers squat down state
           const isSquattingDown = leftKneeAngle < 130 || rightKneeAngle < 130;
-          // Standing up fully requires knee extension
           const isStandingUp = leftKneeAngle > 155 && rightKneeAngle > 155;
 
           if (isSquattingDown) {
@@ -298,16 +267,12 @@ function App() {
               }
             }
           }
-        } 
-        
-        // --- 3. ROBUST JUMPING JACKS CHALLENGE ---
-        else if (currentChallenge === "jumping-jacks") {
+        } else if (currentChallenge === "jumping-jacks") {
           const leftWrist = landmarks[15];
           const rightWrist = landmarks[16];
           const leftShoulder = landmarks[11];
           const rightShoulder = landmarks[12];
 
-          // Wrist Y-coordinate is smaller than shoulder Y-coordinate when hands are raised
           const handsUp = leftWrist.y < leftShoulder.y && rightWrist.y < rightShoulder.y;
 
           if (handsUp) {
