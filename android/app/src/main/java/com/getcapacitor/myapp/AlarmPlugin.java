@@ -15,30 +15,30 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 public class AlarmPlugin extends Plugin {
 
     @PluginMethod
-    public void setAlarm(PluginCall call) {
-        Long time = call.getLong("time");
-        if (time == null) {
-            call.reject("Must provide a time");
-            return;
-        }
+public void setAlarm(PluginCall call) {
+    long triggerAtMillis = call.getLong("time"); // അല്ലെങ്കിൽ JS-ൽ നിന്ന് ലഭിക്കുന്ന timestamp
 
-        Context context = getContext();
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(context, AlarmReceiver.class);
-        
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+    AlarmManager alarmManager = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
+    Intent intent = new Intent(getContext(), AlarmReceiver.class);
+    
+    PendingIntent pendingIntent = PendingIntent.getBroadcast(
+        getContext(), 
+        0, 
+        intent, 
+        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+    );
+
+    if (alarmManager != null) {
+        // Android 6.0+ ൽ Doze mode മറികടന്ന് അലാറം അടിക്കാൻ
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP, 
+            triggerAtMillis, 
+            pendingIntent
         );
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
-            call.reject("Exact alarm permission not granted by user");
-            return;
-        }
-
-        // അലാറം കൃത്യസമയത്ത് ഷെഡ്യൂൾ ചെയ്യുന്നു
-        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, time, pendingIntent);
-        call.resolve();
+        Log.d("AlarmPlugin", "Alarm set for: " + triggerAtMillis);
     }
+    call.resolve();
+}
 
     @PluginMethod
     public void cancelAlarm(PluginCall call) {
