@@ -1,20 +1,20 @@
 -- Merging decision tree log ---
 provider#androidx.core.content.FileProvider
-INJECTED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:50:9-58:20
+INJECTED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:111:9-127:20
 	android:grantUriPermissions
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:54:13-47
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:119:13-47
 	android:authorities
 		INJECTED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:52:13-64
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:115:13-64
 	android:exported
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:53:13-37
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:117:13-37
 	android:name
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:51:13-62
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:113:13-62
 manifest
-ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:2:1-61:12
-INJECTED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:2:1-61:12
-INJECTED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:2:1-61:12
-INJECTED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:2:1-61:12
+ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:3:1-132:12
+INJECTED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:3:1-132:12
+INJECTED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:3:1-132:12
+INJECTED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:3:1-132:12
 MERGED from [:capacitor-android] D:\alarm\move2wake\node_modules\@capacitor\android\capacitor\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
 MERGED from [:capacitor-cordova-android-plugins] D:\alarm\move2wake\android\capacitor-cordova-android-plugins\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-11:12
 MERGED from [org.apache.cordova:framework:14.0.1] C:\Users\NAJIYA\.gradle\caches\8.14.3\transforms\e47013dec160bb8e8e78795049f410c2\transformed\framework-14.0.1\AndroidManifest.xml:20:1-27:12
@@ -58,50 +58,46 @@ MERGED from [androidx.core:core-viewtree:1.0.0] C:\Users\NAJIYA\.gradle\caches\8
 	android:versionCode
 		INJECTED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml
 	xmlns:android
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:2:11-69
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:4:5-63
 uses-permission#android.permission.INTERNET
-ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:5:5-67
+ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:11:5-12:54
 	android:name
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:5:22-64
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:12:9-51
 uses-permission#android.permission.CAMERA
-ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:6:5-65
+ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:14:5-15:52
 	android:name
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:6:22-62
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:15:9-49
 uses-permission#android.permission.SCHEDULE_EXACT_ALARM
-ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:7:5-79
+ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:17:5-18:66
 	android:name
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:7:22-76
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:18:9-63
 uses-permission#android.permission.USE_EXACT_ALARM
-ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:8:5-74
+ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:20:5-21:61
 	android:name
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:8:22-71
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:21:9-58
 uses-permission#android.permission.USE_FULL_SCREEN_INTENT
-ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:9:5-81
+ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:23:5-24:68
 	android:name
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:9:22-78
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:24:9-65
 uses-permission#android.permission.WAKE_LOCK
-ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:10:5-68
+ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:26:5-27:55
 	android:name
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:10:22-65
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:27:9-52
 uses-permission#android.permission.FOREGROUND_SERVICE
-ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:11:5-77
+ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:29:5-30:64
 	android:name
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:11:22-74
-uses-permission#android.permission.RECEIVE_BOOT_COMPLETED
-ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:12:5-81
-	android:name
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:12:22-78
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:30:9-61
 uses-permission#android.permission.VIBRATE
-ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:13:5-66
+ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:32:5-33:53
 	android:name
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:13:22-63
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:33:9-50
 uses-permission#android.permission.POST_NOTIFICATIONS
-ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:14:5-77
+ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:35:5-36:64
 	android:name
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:14:22-74
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:36:9-61
 application
-ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:16:5-59:19
-INJECTED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:16:5-59:19
+ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:43:5-130:19
+INJECTED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:43:5-130:19
 MERGED from [:capacitor-cordova-android-plugins] D:\alarm\move2wake\android\capacitor-cordova-android-plugins\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:5-9:19
 MERGED from [:capacitor-cordova-android-plugins] D:\alarm\move2wake\android\capacitor-cordova-android-plugins\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:5-9:19
 MERGED from [androidx.emoji2:emoji2:1.3.0] C:\Users\NAJIYA\.gradle\caches\8.14.3\transforms\353d69426d62513a7e19e841051a3a44\transformed\emoji2-1.3.0\AndroidManifest.xml:23:5-33:19
@@ -121,69 +117,59 @@ MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\NA
 	android:appComponentFactory
 		ADDED from [androidx.core:core:1.17.0] C:\Users\NAJIYA\.gradle\caches\8.14.3\transforms\11094a199bb7945826b161d8a9c17beb\transformed\core-1.17.0\AndroidManifest.xml:28:18-86
 	android:supportsRtl
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:21:9-35
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:53:9-35
 	android:label
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:19:9-41
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:49:9-41
 	android:roundIcon
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:20:9-54
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:51:9-54
 	android:icon
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:18:9-43
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:47:9-43
 	android:allowBackup
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:17:9-35
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:45:9-35
 	android:theme
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:22:9-40
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:55:9-40
 activity#com.getcapacitor.myapp.MainActivity
-ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:24:9-37:20
+ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:62:9-91:20
 	android:label
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:27:13-56
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:66:13-56
 	android:turnScreenOn
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:31:13-40
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:74:13-40
 	android:showWhenLocked
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:30:13-42
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:72:13-42
 	android:launchMode
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:29:13-44
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:70:13-44
 	android:exported
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:32:13-36
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:76:13-36
 	android:configChanges
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:25:13-129
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:78:13-129
 	android:theme
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:28:13-62
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:68:13-62
 	android:name
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:26:13-41
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:64:13-41
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:33:13-36:29
+ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:81:13-89:29
 action#android.intent.action.MAIN
-ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:34:17-69
+ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:83:17-84:65
 	android:name
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:34:25-66
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:84:21-62
 category#android.intent.category.LAUNCHER
-ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:35:17-77
+ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:86:17-87:71
 	android:name
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:35:27-74
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:87:21-68
 receiver#com.getcapacitor.myapp.AlarmReceiver
-ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:40:9-48:20
+ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:98:9-104:39
 	android:enabled
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:42:13-35
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:102:13-35
 	android:exported
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:43:13-36
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:104:13-36
 	android:name
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:41:13-42
-intent-filter#action:name:android.intent.action.BOOT_COMPLETED+action:name:android.intent.action.MY_PACKAGE_REPLACED
-ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:44:13-47:29
-action#android.intent.action.BOOT_COMPLETED
-ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:45:17-79
-	android:name
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:45:25-76
-action#android.intent.action.MY_PACKAGE_REPLACED
-ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:46:17-84
-	android:name
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:46:25-81
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:100:13-42
 meta-data#android.support.FILE_PROVIDER_PATHS
-ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:55:13-57:54
+ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:121:13-125:54
 	android:resource
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:57:17-51
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:125:17-51
 	android:name
-		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:56:17-67
+		ADDED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml:123:17-67
 uses-sdk
 INJECTED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from D:\alarm\move2wake\android\app\src\main\AndroidManifest.xml

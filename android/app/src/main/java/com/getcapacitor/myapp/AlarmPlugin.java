@@ -8,49 +8,103 @@ import android.os.Build;
 
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
-import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
+import com.getcapacitor.PluginMethod;
 
 @CapacitorPlugin(name = "AlarmPlugin")
 public class AlarmPlugin extends Plugin {
 
+    private static final int ALARM_REQUEST_CODE = 1000;
+
     @PluginMethod
-public void setAlarm(PluginCall call) {
-    long triggerAtMillis = call.getLong("time"); // അല്ലെങ്കിൽ JS-ൽ നിന്ന് ലഭിക്കുന്ന timestamp
+    public void setAlarm(PluginCall call) {
+        Long triggerAtMillis = call.getLong("time");
 
-    AlarmManager alarmManager = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
-    Intent intent = new Intent(getContext(), AlarmReceiver.class);
-    
-    PendingIntent pendingIntent = PendingIntent.getBroadcast(
-        getContext(), 
-        0, 
-        intent, 
-        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-    );
+        if (triggerAtMillis == null) {
+            call.reject("Alarm time is required");
+            return;
+        }
 
-    if (alarmManager != null) {
-        // Android 6.0+ ൽ Doze mode മറികടന്ന് അലാറം അടിക്കാൻ
-        alarmManager.setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP, 
-            triggerAtMillis, 
-            pendingIntent
+        Context context = getContext();
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+                && !alarmManager.canScheduleExactAlarms()) {
+            call.reject("Exact alarm permission is not granted");
+            return;
+        }
+
+        Intent intent = new Intent(context, AlarmReceiver.class);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                context,
+                ALARM_REQUEST_CODE,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
-        Log.d("AlarmPlugin", "Alarm set for: " + triggerAtMillis);
+
+        try {
+            alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerAtMillis,
+                    pendingIntent
+            );
+
+            call.resolve();
+        } catch (Exception e) {
+            call.reject("Could not schedule alarm", e);
+        }
     }
-    call.resolve();
-}
 
     @PluginMethod
     public void cancelAlarm(PluginCall call) {
         Context context = getContext();
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
         Intent intent = new Intent(context, AlarmReceiver.class);
-        
+
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                context,
+                ALARM_REQUEST_CODE,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
         alarmManager.cancel(pendingIntent);
+        stopAlarmService();
         call.resolve();
+    }
+
+    @PluginMethod
+    public void startAlarmSound(PluginCall call) {
+        startAlarmService();
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void stopAlarmSound(PluginCall call) {
+        stopAlarmService();
+        call.resolve();
+    }
+
+    private void startAlarmService() {
+        Context context = getContext();
+        Intent serviceIntent = new Intent(context, AlarmService.class);
+
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(serviceIntent);
+            } else {
+                context.startService(serviceIntent);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void stopAlarmService() {
+        Context context = getContext();
+        Intent serviceIntent = new Intent(context, AlarmService.class);
+        context.stopService(serviceIntent);
     }
 }

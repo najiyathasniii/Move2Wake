@@ -8,7 +8,12 @@
         android:minSdkVersion="24"
         android:targetSdkVersion="36" />
 
-    <!-- PERMISSIONS -->
+    <!--
+    =====================================================
+         PERMISSIONS
+    ======================================================
+    -->
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
@@ -16,7 +21,6 @@
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
@@ -25,7 +29,11 @@
         android:protectionLevel="signature" />
 
     <uses-permission android:name="com.getcapacitor.myapp.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
-
+    <!--
+ =====================================================
+         APPLICATION
+    ======================================================
+    -->
     <application
         android:allowBackup="true"
         android:appComponentFactory="androidx.core.app.CoreComponentFactory"
@@ -35,8 +43,14 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:testOnly="true"
         android:theme="@style/AppTheme" >
+
+        <!--
+        =================================================
+             MAIN ACTIVITY
+        ==================================================
+        -->
+
         <activity
             android:name="com.getcapacitor.myapp.MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode"
@@ -53,16 +67,22 @@
             </intent-filter>
         </activity>
 
-        <!-- BroadcastReceiver for Exact Alarm Triggering -->
+        <!--
+        =================================================
+             ALARM RECEIVER
+        ==================================================
+        -->
+
         <receiver
             android:name="com.getcapacitor.myapp.AlarmReceiver"
             android:enabled="true"
-            android:exported="true" >
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
-            </intent-filter>
-        </receiver>
+            android:exported="true" />
+
+        <!--
+        =================================================
+             FILE PROVIDER
+        ==================================================
+        -->
 
         <provider
             android:name="androidx.core.content.FileProvider"

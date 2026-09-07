@@ -1,61 +1,156 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- PERMISSIONS -->
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
-    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
-    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- =====================================================
+         PERMISSIONS
+    ====================================================== -->
+
+    <uses-permission
+        android:name="android.permission.INTERNET" />
+
+    <uses-permission
+        android:name="android.permission.CAMERA" />
+
+    <!-- Exact Alarm -->
+    <uses-permission
+        android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
+    <uses-permission
+        android:name="android.permission.USE_EXACT_ALARM" />
+
+    <!-- Full Screen Alarm -->
+    <uses-permission
+        android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+
+    <!-- Wake Lock -->
+    <uses-permission
+        android:name="android.permission.WAKE_LOCK" />
+
+    <!-- Foreground Service -->
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <!-- Android 14+ Media Playback Foreground Service -->
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+
+    <!-- Vibration -->
+    <uses-permission
+        android:name="android.permission.VIBRATE" />
+
+    <!-- Notifications -->
+    <uses-permission
+        android:name="android.permission.POST_NOTIFICATIONS" />
+
+
+    <!-- =====================================================
+         APPLICATION
+    ====================================================== -->
 
     <application
+
         android:allowBackup="true"
+
         android:icon="@mipmap/ic_launcher"
+
         android:label="@string/app_name"
+
         android:roundIcon="@mipmap/ic_launcher_round"
+
         android:supportsRtl="true"
+
         android:theme="@style/AppTheme">
 
+
+        <!-- =================================================
+             MAIN ACTIVITY
+        ================================================== -->
+
         <activity
-            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode"
+
             android:name=".MainActivity"
+
             android:label="@string/title_activity_main"
+
             android:theme="@style/AppTheme.NoActionBarLaunch"
+
             android:launchMode="singleTask"
+
             android:showWhenLocked="true"
+
             android:turnScreenOn="true"
-            android:exported="true">
+
+            android:exported="true"
+
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode">
+
+
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+
+                <action
+                    android:name="android.intent.action.MAIN" />
+
+                <category
+                    android:name="android.intent.category.LAUNCHER" />
+
             </intent-filter>
+
         </activity>
 
-        <!-- BroadcastReceiver for Exact Alarm Triggering -->
-        <receiver 
-            android:name=".AlarmReceiver" 
-            android:enabled="true" 
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
-            </intent-filter>
-        </receiver>
+
+        <!-- =================================================
+             ALARM RECEIVER
+        ================================================== -->
+
+        <receiver
+
+            android:name=".AlarmReceiver"
+
+            android:enabled="true"
+
+            android:exported="false" />
+
+
+        <!-- =================================================
+             ALARM FOREGROUND SERVICE
+        ================================================== -->
+
+        <service
+
+            android:name=".AlarmService"
+
+            android:enabled="true"
+
+            android:exported="false"
+
+            android:foregroundServiceType="mediaPlayback" />
+
+
+        <!-- =================================================
+             FILE PROVIDER
+        ================================================== -->
 
         <provider
+
             android:name="androidx.core.content.FileProvider"
+
             android:authorities="${applicationId}.fileprovider"
+
             android:exported="false"
+
             android:grantUriPermissions="true">
+
             <meta-data
+
                 android:name="android.support.FILE_PROVIDER_PATHS"
+
                 android:resource="@xml/file_paths" />
+
         </provider>
+
+
     </application>
 
 </manifest>
